@@ -1,45 +1,42 @@
 # Unlayer
 
-Upload a recording, explore its instrument parts, and inspect its loudness in one listening workspace.
+Browser-based music separation and audio level analysis. [Open Unlayer](https://mcgoldfish.github.io/unlayer/).
 
-- Six synchronized parts: vocals, drums, bass, guitar, keyboard (piano), and other.
-- Shared playback, waveform seeking, Solo/Mute, and WAV mix download.
-- Separation progress with preparation, inference, and loading stages.
-- RMS and short-term loudness charts; integrated LUFS, true peak, sample peak, and loudness range.
-- Black background, animated wave contours, and white instrument waveforms. Reduced motion is respected.
+## Use
 
-## Run locally
+Select a recording. Unlayer downloads a pretrained model on first use, separates the audio on your device, and displays four synchronized parts: vocals, drums, bass and other. Guitar and keyboard are included in Other in this browser version. Solo/Mute, shared waveform seeking and WAV mix download work without a Python service.
 
-Requires Node.js and Python 3.12. From this folder, create the Python environment and install dependencies (Windows PowerShell):
+- First use downloads approximately 172 MB of model data from Hugging Face, plus ONNX Runtime Web from jsDelivr. Browser caching is best effort and requires available storage.
+- Audio is decoded and processed in browser memory; it is not uploaded to a server. Refreshing clears audio.
+- WebGPU is preferred when available; WebAssembly CPU is the fallback. Performance and memory limits vary by device. Desktop Chrome/Edge are recommended. Keep the tab open; Cancel terminates the worker.
+- Files: up to 50 MB and 10 minutes, subject to device memory. Supported codecs depend on browser decoding. Long recordings can require substantial RAM.
+- Charts show one-second RMS dBFS and sample peak. LUFS, true peak and LRA are explicitly unavailable in the browser version. Digital levels do not measure headphone volume.
 
-```powershell
-py -3.12 -m venv .venv
-./.venv/Scripts/python.exe -m pip install torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cpu
-./.venv/Scripts/python.exe -m pip install -r requirements.txt
-./start.ps1
+## Development
+
+Node.js is sufficient for the frontend:
+
+```sh
+npm run dev
 ```
 
-Open http://127.0.0.1:5184. The audio service listens at http://127.0.0.1:5185. Alternatively, run `npm run dev` and `./.venv/Scripts/python.exe backend.py` in separate terminals. FFmpeg is supplied through imageio-ffmpeg.
+Open http://127.0.0.1:5184. No build or frontend dependency installation is required. The optional `PORT` environment variable changes the preview port. GitHub Actions publishes `dist/` to GitHub Pages on pushes to `main`.
 
-The first separation downloads the pretrained Demucs htdemucs_6s model into `.models/`. CPU processing can take several minutes. Select an audio file to start measurement and separation automatically. Limits: 50 MB and 10 minutes per file, with one separation job at a time.
-
-## Measurements and limits
-
-Instrument parts are estimates and may contain overlap. The keyboard part estimates piano; synthesizers may remain in Other. Loudness uses FFmpeg loudnorm and ebur128. Digital dBFS/dBTP measurements are not acoustic sound pressure; loudness range is not a TT DR score. No commercial recordings or model weights are bundled.
-
-Decoded audio stays in browser memory. Uploaded files are deleted after processing; temporary output stems expire after one hour. Abrupt termination may leave temporary files. Reloading clears the current browser session.
-
-This is a loopback-only local application. Public deployment needs a separate production inference service, authentication, quotas, worker isolation, and storage lifecycle controls. Static hosting alone cannot run the Python model.
-
-## Checks
-
-```powershell
+```sh
 npm run check
 npm test
-./.venv/Scripts/python.exe analysis_test.py
-./.venv/Scripts/python.exe smoke_separation.py --wav
 ```
 
-The last check runs actual model inference and requires downloaded weights. The audio unit test uses an original synthesized fixture; it does not measure model separation quality.
+The browser pipeline regression test exercises actual FFT preprocessing and overlap-add with deterministic model outputs. It verifies chunk duration, endpoint/seam preservation, progress and tensor cleanup; it does not measure model separation quality.
 
-Model: [Demucs](https://github.com/facebookresearch/demucs). No application source license has been selected.
+## Architecture and attribution
+
+- `dist/app.js`: selection, mixing, waveform display, export and worker orchestration.
+- `dist/separation-worker.mjs`: model download/cache and browser inference. No localhost API requests.
+- `dist/vendor/demucs/`: MIT [demucs-web](https://github.com/timcsy/demucs-web), pinned revision and license included. Local fixes cover segment counting, endpoint windows and tensor disposal.
+- [Meta Demucs](https://github.com/facebookresearch/demucs) HTDemucs model, browser ONNX conversion hosted by [timcsy](https://huggingface.co/timcsy/demucs-web-onnx).
+- [ONNX Runtime Web](https://onnxruntime.ai/docs/tutorials/web/), pinned to 1.23.2.
+
+Source separation estimates can contain overlap and artifacts. Supply recordings you have permission to process. No commercial recordings are bundled. No application source license has been selected.
+
+The earlier Python six-source separator and FFmpeg analysis remain in the repository for development/reference (`backend.py`, `requirements.txt`, `start.ps1` and Python checks). The published browser interface does not use them. It does not currently provide six-source browser separation or EBU R128 measurements.

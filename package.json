@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "node server.cjs",
-    "check": "node --check dist/app.js && node --check dist/analysis.js && node --check dist/workspace.js",
-    "test": "node audio.test.cjs && node retry.test.cjs"
+    "check": "node --check dist/app.js && node --check dist/analysis.js && node --check dist/workspace.js && node --check dist/separation-worker.mjs",
+    "test": "node audio.test.cjs && node retry.test.cjs && node browser-pipeline.test.mjs"
   }
 }
