@@ -1,0 +1,13 @@
+.venv/
+.models/
+.openai/
+__pycache__/
+.env
+.env.*
+!.env.example
+*.log
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.ogg

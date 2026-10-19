@@ -1,0 +1,10 @@
+{
+  "name": "unlayer",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "node server.cjs",
+    "check": "node --check dist/app.js && node --check dist/analysis.js && node --check dist/workspace.js",
+    "test": "node audio.test.cjs && node retry.test.cjs"
+  }
+}
