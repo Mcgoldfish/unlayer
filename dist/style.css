@@ -35,3 +35,13 @@ body:before,body:after{border:0;border-radius:0;box-shadow:none;z-index:0;backgr
 body{background-color:#030405;background-image:radial-gradient(ellipse at 0% 32%,#69c9b71a 0%,transparent 43%),radial-gradient(ellipse at 100% 6%,#8bbfd91a 0%,transparent 44%),radial-gradient(ellipse at 84% 92%,#66bea710 0%,transparent 40%);background-attachment:fixed}
 body:before,body:after{filter:drop-shadow(0 0 4px #a3ead1a6) drop-shadow(0 0 16px #75d9c166);opacity:1}
 body:after{opacity:.75;filter:drop-shadow(0 0 5px #a3dceba6) drop-shadow(0 0 22px #78b9d355)}
+
+/* Editorial identity: expressive display type and a quiet interface. */
+body,button,input,select,textarea{font-family:"Manrope",sans-serif}
+.wordmark,.wordmark span,h1,h1 span,h2{font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:500}
+.wordmark{font-size:42px;line-height:1.1;letter-spacing:-.055em}
+h1,h1 span{font-size:30px;line-height:1.2}
+h2{font-size:24px;line-height:1.2}
+.workspace-label,#time,.metrics strong{font-family:"Manrope",sans-serif}
+#time,.metrics strong{font-variant-numeric:tabular-nums}
+@media(max-width:700px){.wordmark{font-size:36px}h1,h1 span{font-size:26px}h2{font-size:22px}}
