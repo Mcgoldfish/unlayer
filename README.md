@@ -1,8 +1,26 @@
 # Unlayer
 
+## Introduction
+
+A browser-based music workspace that separates recordings into vocals, drums, bass and other. Explore synchronized waveforms, adjust the listening mix and inspect original-recording signal levels without a Python service.
+
+## Structure
+
+The header provides audio selection and Help. The player uses a shared timeline, with four stem lanes offering Solo and Mute. Reset mix and Download mix control the output. Loudness shows one-second RMS levels; Details shows sample peak. LUFS, true peak and LRA are unavailable in browser mode. Guitar and keyboard remain in Other.
+
+## How it works
+
+Select a recording → decode audio in memory → download model/runtime files on first use → run separation locally in a worker → load four aligned stems → seek and solo/mute parts → inspect levels → download a WAV mix. WebGPU is preferred with a WebAssembly CPU fallback. Cancel terminates the worker; refreshing clears audio. Audio is not uploaded.
+
+## Others
+
+Run `npm run dev` and open http://127.0.0.1:5184; no frontend dependency installation or build is required. Run `npm run check` and `npm test` for verification. GitHub Actions publishes `dist/` on pushes to main. First use downloads approximately 172 MB of model data plus runtime files.
+
+### Detailed reference
+
 Browser-based music separation and audio level analysis. [Open Unlayer](https://mcgoldfish.github.io/unlayer/).
 
-## Use
+#### Use
 
 Select a recording. Unlayer downloads a pretrained model on first use, separates the audio on your device, and displays four synchronized parts: vocals, drums, bass and other. Guitar and keyboard are included in Other in this browser version. Solo/Mute, shared waveform seeking and WAV mix download work without a Python service.
 
@@ -12,7 +30,7 @@ Select a recording. Unlayer downloads a pretrained model on first use, separates
 - Files: up to 50 MB and 10 minutes, subject to device memory. Supported codecs depend on browser decoding. Long recordings can require substantial RAM.
 - Charts show one-second RMS dBFS and sample peak. LUFS, true peak and LRA are explicitly unavailable in the browser version. Digital levels do not measure headphone volume.
 
-## Development
+#### Development
 
 Node.js is sufficient for the frontend:
 
@@ -29,7 +47,7 @@ npm test
 
 The browser pipeline regression test exercises actual FFT preprocessing and overlap-add with deterministic model outputs. It verifies chunk duration, endpoint/seam preservation, progress and tensor cleanup; it does not measure model separation quality.
 
-## Architecture and attribution
+#### Architecture and attribution
 
 - `dist/app.js`: selection, mixing, waveform display, export and worker orchestration.
 - `dist/separation-worker.mjs`: model download/cache and browser inference. No localhost API requests.
